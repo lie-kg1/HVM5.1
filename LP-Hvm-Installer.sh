@@ -29,7 +29,7 @@ clear
 # ==========================
 
 echo "==========================================="
-echo "        ⚡ LIGHTINGPLAYS INSTALLER ⚡"
+echo "        ⚡ HVM INSTALLER ⚡"
 echo "==========================================="
 echo ""
 echo "1) HVM 5.1 Installer"
