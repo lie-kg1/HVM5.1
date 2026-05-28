@@ -2,7 +2,7 @@
 """
 HVM Panel - Node Agent
 Version: 2.0-PRO-ULTIMATE
-Developer: LIE-KG
+Developer: LIE_KG
 Description: Enhanced LXC Container Management Node Agent
 """
 
@@ -43,7 +43,7 @@ BANNER = """
 
 # Version info
 VERSION = "2.0-PRO-ULTIMATE"
-DEVELOPER = "Hopingboz"
+DEVELOPER = "lie_kg"
 
 # Print banner on startup
 print(BANNER)
