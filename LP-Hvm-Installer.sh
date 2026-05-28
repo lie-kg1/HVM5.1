@@ -1,21 +1,3 @@
-Looking at your current setup script, there are several structural mismatches, missing execution steps, and paths that don't align correctly. If you were to run this script as written, options 1, 3, and 4 would either halt or fail silently midway through.
-
-Here is a breakdown of the specific broken items in your code, followed by a fully optimized, modular, and colored version using the layout rules from your previous files.
-
-### ⚠️ Broken Items in the Original Code
-
-* **Option 1 (Systemd vs. Execution mismatch):** You write a systemd service file pointing to `/root/hvm/hvm.py`, but you cloned the repository into `./HVM5.1`. Immediately after writing the service file, you attempt to run `python3 hvm-5.1.py` manually instead of starting the daemon via `systemctl`.
-* **Option 4 (`newgrp` breaks script execution):** Running the command `newgrp lxd` forces the shell to fork into a new sub-shell interactive session. This completely halts the rest of your Bash script until a user types `exit`. We must bypass this interactive fork inside non-interactive automated setups.
-* **Option 4 (Path Mismatch):** You clone into `VPSbotv6` (wherever the script happens to be running), but the systemd service file relies on a static path: `/root/VPSbotv6`. We need to explicitly handle this directory configuration.
-* **Missing Error Flags:** Critical commands (like `git clone`) lack failsafes; if a download fails, the script blindly tries to execute subsequent file paths anyway.
-
----
-
-### 🛠️ Optimized & Fixed Script
-
-Here is the fully rewritten code incorporating robust checking, the color palette, matching container layouts, and silent variable configurations.
-
-```bash
 #!/bin/bash
 
 # ==========================================
@@ -26,7 +8,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 BLUE='\033[0;34m'
 CYAN='\033[0;36m'
-NC='\033[0m'
+NC='\033[0m' # No Color (Reset)
 
 # ==========================================
 # OS DETECTION & VALIDATION
@@ -36,7 +18,7 @@ if [ -f /etc/os-release ]; then
     . /etc/os-release
     OS=$ID
 else
-    echo -e "${RED}❌ Cannot detect OS. Exiting...${NC}"
+    echo -e "${RED}❌ Cannot detect operating system. Exiting...${NC}"
     exit 1
 fi
 
@@ -47,13 +29,14 @@ if [[ "$OS" != "ubuntu" && "$OS" != "debian" ]]; then
 fi
 
 echo -e "${GREEN}Detected OS:${NC} ${YELLOW}$OS${NC}"
-sleep 1
+sleep 1.5
 
 # ==========================================
 # MAIN INTERACTIVE LOOP
 # ==========================================
 while true; do
     clear
+    # Colorful Box-Drawn Interface Block
     echo -e "${CYAN}╔═════════════════════════════════════╗${NC}"
     echo -e "${CYAN}║${NC}          ${YELLOW}⚡ HVM INSTALLER ⚡${NC}         ${CYAN}║${NC}"
     echo -e "${CYAN}╠═════════════════════════════════════╣${NC}"
@@ -75,15 +58,17 @@ while true; do
             echo -e "\n${BLUE}Executing Option 1: HVM 5.1 Installer...${NC}"
             apt update -y && apt install git python3-pip -y
 
+            # Setup global pip override for managed environments
             mkdir -p ~/.config/pip
             echo -e "[global]\nbreak-system-packages = true" > ~/.config/pip/pip.conf
 
-            # Clean and setup static directory to match service files
+            # Pull source tools directly to fixed runtime destinations
             rm -rf /root/hvm
             if git clone https://github.com/DreamHost2ws/HVM5.1 /root/hvm; then
                 cd /root/hvm || exit
                 pip install -r requirements.txt
 
+                # Generate matching Systemd Application Service Units
                 cat <<EOF > /etc/systemd/system/hvm.service
 [Unit]
 Description=HVM Panel (Discord Bot)
@@ -149,7 +134,7 @@ EOF
             mkdir -p ~/.config/pip
             echo -e "[global]\nbreak-system-packages = true" > ~/.config/pip/pip.conf
 
-            # Ensure execution environments match the targeted destination paths
+            # Clean and target installation paths safely
             rm -rf /root/VPSbotv6
             if ! git clone https://github.com/DreamHost2ws/VPSbotv6 /root/VPSbotv6; then
                 echo -e "${RED}❌ Failed to clone tool components.${NC}"
@@ -158,13 +143,13 @@ EOF
                 continue
             fi
 
-            # Environment Setup Architecture Matrix
+            # Operating System Provisioning Logic
             if [[ "$OS" == "ubuntu" ]]; then
                 sudo apt update && sudo apt upgrade -y
                 sudo apt install lxc lxc-utils bridge-utils uidmap snapd -y
                 sudo systemctl enable --now snapd.socket
                 sudo snap install lxd
-                # Using 'sg' bypasses the interactive shell lock that 'newgrp' produces
+                # System group bypass to avoid script execution halting
                 sg lxd -c "lxd init --auto"
             fi
 
@@ -184,6 +169,7 @@ EOF
             read -p "Enter DISCORD BOT TOKEN: " TOKEN
             read -p "Enter MAIN ADMIN ID: " ADMIN
 
+            # Deploy Service Management Engine Components
             cat <<EOF > /etc/systemd/system/unixbot.service
 [Unit]
 Description=UnixBot Discord Bot
@@ -207,7 +193,7 @@ EOF
             systemctl enable unixbot
             systemctl restart unixbot
 
-            echo -e "${GREEN}✓ LXC BOT V6 Installed & Managed via systemd service system.${NC}"
+            echo -e "${GREEN}✓ LXC BOT V6 Installed & Managed via background systemd service systems.${NC}"
             echo -e "\n${YELLOW}Press Enter to return to menu...${NC}"
             read -r
             ;;
@@ -223,5 +209,3 @@ EOF
             ;;
     esac
 done
-
-```
