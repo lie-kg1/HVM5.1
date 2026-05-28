@@ -38,7 +38,7 @@ while true; do
     clear
     # Colorful Box-Drawn Interface Block
     echo -e "${CYAN}╔═════════════════════════════════════╗${NC}"
-    echo -e "${CYAN}║${NC}         ${YELLOW}⚡ HVM INSTALLER ⚡${NC}         ${CYAN}║${NC}"
+    echo -e "${CYAN}║${NC}         ${YELLOW}⚡ HVM INSTALLER ⚡${NC}          ${CYAN}║${NC}"
     echo -e "${CYAN}╠═════════════════════════════════════╣${NC}"
     echo -e "${CYAN}║${NC}                                     ${CYAN}║${NC}"
     echo -e "${CYAN}║${NC}  ${GREEN}1.${NC} HVM 5.1 Installer               ${CYAN}║${NC}"
