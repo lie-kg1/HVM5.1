@@ -149,16 +149,29 @@ EOF
                 sudo apt install lxc lxc-utils bridge-utils uidmap snapd -y
                 sudo systemctl enable --now snapd.socket
                 sudo snap install lxd
-                # System group bypass to avoid script execution halting
-                sg lxd -c "lxd init --auto"
+                
+                # FIX: Force direct fallback path executions if shell configuration profile hasn't loaded snap paths yet
+                if command -v lxd &> /dev/null; then
+                    sg lxd -c "lxd init --auto"
+                else
+                    sg lxd -c "/snap/bin/lxd init --auto"
+                fi
             fi
 
             if [[ "$OS" == "debian" ]]; then
                 sudo apt install snapd bridge-utils uidmap -y
                 sudo systemctl enable --now snapd.socket
+                # Fix background installation race condition delays
+                sleep 2
                 [ -L /snap ] || sudo ln -s /var/lib/snapd/snap /snap
                 sudo snap install lxd
-                sg lxd -c "lxd init --auto"
+                
+                # FIX: Alternative hard path initialization routine execution
+                if command -v lxd &> /dev/null; then
+                    sg lxd -c "lxd init --auto"
+                else
+                    sg lxd -c "/snap/bin/lxd init --auto"
+                fi
             fi
 
             cd /root/VPSbotv6 || exit
@@ -189,9 +202,9 @@ RestartSec=5
 WantedBy=multi-user.target
 EOF
 
-            systemctl daemon-reload
-            systemctl enable unixbot
-            systemctl restart unixbot
+                systemctl daemon-reload
+                systemctl enable unixbot
+                systemctl restart unixbot
 
             echo -e "${GREEN}✓ LXC BOT V6 Installed & Managed via background systemd service systems.${NC}"
             echo -e "\n${YELLOW}Press Enter to return to menu...${NC}"
