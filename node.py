@@ -2,7 +2,7 @@
 """
 HVM Panel - Node Agent
 Version: 2.0-PRO-ULTIMATE
-Developer: Hopingboz
+Developer: LIE-KG
 Description: Enhanced LXC Container Management Node Agent
 """
 
